@@ -17,8 +17,7 @@ most restrictive upstream (JTFRAME / JTCORES).
 
 | Component | Author | Project | License |
 |-----------|--------|---------|---------|
-| **MC6809** — Motorola 6809 cycle-accurate core | Greg Miller | [cavnex/mc6809](https://github.com/cavnex/mc6809) | GPL-3 |
-| **T80** — Z80 core | Daniel Wallner, MikeJ | [MiSTer-devel/T80](https://github.com/MiSTer-devel/T80) | BSD / GPL |
+| **MC6809** — Motorola 6809 cycle-accurate core (used for both main + sound CPU) | Greg Miller | [cavnex/mc6809](https://github.com/cavnex/mc6809) | GPL-3 |
 | **JTFRAME / JTCORES** — framework, filters, tilemap, etc. | Jose Tejada ([@topapate](https://twitter.com/topapate)) | [jotego/jtcores](https://github.com/jotego/jtcores) | GPL-3 |
 | **JT03** — YM2203 FM + PSG synthesizer | Jose Tejada | [jotego/jt12](https://github.com/jotego/jt12) | GPL-3 |
 | **JT49** — AY-3-8910 PSG | Jose Tejada | [jotego/jt49](https://github.com/jotego/jt49) | GPL-3 |

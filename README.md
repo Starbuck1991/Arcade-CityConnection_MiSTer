@@ -34,6 +34,17 @@ see Acknowledgements).
 - City Connection (set 2) — alternate set (citycona, c11b variant)
 - City Connection (Cruisin) — Kitkorp license variant (cruisin)
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/Screenshot%202026-05-25%2019-45-58.png" width="48%" />
+  <img src="docs/Screenshot%202026-05-25%2019-46-38.png" width="48%" />
+</p>
+<p align="center">
+  <img src="docs/Screenshot%202026-05-25%2019-46-43.png" width="48%" />
+  <img src="docs/Screenshot%202026-05-25%2019-47-28.png" width="48%" />
+</p>
+
 ## The 15-day positioning bug
 
 Two weeks of pixel hunt: sprites and the platform "trail" effect were all
