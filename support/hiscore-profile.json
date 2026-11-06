@@ -1,0 +1,29 @@
+{
+  "source": "https://github.com/mamedev/mame/blob/master/plugins/hiscore/hiscore.dat",
+  "sets": [
+    "citycon",
+    "citycona",
+    "cruisin"
+  ],
+  "entries": [
+    [
+      85,
+      3,
+      0,
+      19
+    ],
+    [
+      67,
+      3,
+      0,
+      2
+    ],
+    [
+      2304,
+      240,
+      83,
+      144
+    ]
+  ],
+  "nvram_size": 246
+}

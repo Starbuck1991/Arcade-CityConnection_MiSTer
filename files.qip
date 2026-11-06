@@ -1,4 +1,5 @@
 set_global_assignment -name SYSTEMVERILOG_FILE Template.sv
+set_global_assignment -name VERILOG_FILE rtl/jtframe_hiscore.v
 set_global_assignment -name VERILOG_FILE rtl/pll.v
 set_global_assignment -name QIP_FILE rtl/pll.qip
 

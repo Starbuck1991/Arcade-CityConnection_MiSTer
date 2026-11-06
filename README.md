@@ -12,6 +12,39 @@ MAME references and pixel-accurate validation against original PCB footage.
 
 ## Status
 
+### High-score persistence fork
+
+This fork adds high-score persistence by J. M. Artés, reusing the GPL-3.0-or-later
+Hiscores_MiSTer/Bagman engine already adapted for JTFRAME and Tecmo. The
+original City Connection core remains the work of Umberto Parisi and the
+contributors listed in [AUTHORS.md](AUTHORS.md).
+
+Use `releases/CityConnection_Hiscore.rbf` and the MRA labelled **Hiscore**.
+Enable **Autosave Hiscores**, finish entering your initials, then open the OSD
+to save changed scores. Persistence of the score and initials, and reopening
+the OSD without an unnecessary save, were physically verified by J. M. Artés
+for **City Connection set 1 (`citycon`)**. Set 2 and Cruisin use the same MAME
+profile but have not been individually verified.
+
+The [MAME hiscore profile](https://github.com/mamedev/mame/blob/master/plugins/hiscore/hiscore.dat)
+contains three work RAM ranges: `0055` (3 bytes), `0043` (3 bytes) and `0900`
+(240 bytes). All 246 bytes are preserved. The adapter requests MC6809 HALT,
+waits for BA=BS=1, then uses the previously unused synchronous RAM port B.
+IOCTL indices 5 and 6 carry the profile and NVRAM without resetting the game.
+The common engine is reused unchanged; it checks initialization signatures
+and requests saving only when its captured data changes.
+
+`support/preparar_mra.py` generates the three MRA from the original releases,
+preserving their ROM definitions and comments. `support/hiscore-profile.json`
+records the ranges and source. Build the existing `CityConnection.qpf` project
+with Quartus 19.1 (`quartus_sh --flow compile CityConnection`); the resulting
+`output_files/CityConnection.rbf` is published as `CityConnection_Hiscore.rbf`.
+`sys/pll_q19.qip` references the same IP files as the original Quartus 17 QIP.
+The `logo` directory is required by the original pause overlay during synthesis.
+
+The full build completed with no errors. Physical validation applies to the
+set explicitly identified above, not automatically to the other variants.
+
 **Current version: 1.0** (May 2026) — first public release.
 
 The core runs the full game with audio and has been validated pixel-by-pixel

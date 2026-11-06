@@ -24,6 +24,16 @@ most restrictive upstream (JTFRAME / JTCORES).
 | **sdram.sv** — SDRAM controller | Sorgelig ([sorgelig](https://github.com/sorgelig)) | [MiSTer-devel](https://github.com/MiSTer-devel) | GPL-3 |
 | **sys/ framework** — MiSTer HPS/IO, OSD, video scaler, audio | Sorgelig / MiSTer-devel | [MiSTer-devel/Main_MiSTer](https://github.com/MiSTer-devel/Main_MiSTer) | GPL-3 |
 
+## Hiscore adaptation (2026)
+
+Integration and MC6809 work RAM adapter by J. M. Artés. The original core
+remains the work of Umberto Parisi and the contributors credited above.
+The GPL-3.0-or-later engine in `rtl/jtframe_hiscore.v` is reused unchanged
+from the Tecmo/JTFRAME integrations, derived from Bagman and
+[Hiscores_MiSTer](https://github.com/JimmyStones/Hiscores_MiSTer),
+copyright Alan Steremberg and Jim Gregory (2021). Its original notices remain.
+Memory ranges and initialization signatures come from MAME's `hiscore.dat`.
+
 ## Reference
 
 - **City Connection arcade hardware** — Jaleco, 1985. This FPGA core is a

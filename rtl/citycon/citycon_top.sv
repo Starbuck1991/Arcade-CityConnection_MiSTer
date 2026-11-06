@@ -33,6 +33,16 @@ module citycon_top
 	input             video_reset,  // solo ~pll_locked (video sempre attivo)
 	input             pause,        // halt CPU when high
 
+	// Adaptación hiscore: J. M. Artés, 2026. Solo RAM de trabajo.
+	input             hs_req,
+	output            hs_ack,
+	input             hs_valid,
+	input             hs_write,
+	input      [31:0] hs_addr,
+	input       [7:0] hs_wdata,
+	output reg        hs_ready = 1'b0,
+	output      [7:0] hs_rdata,
+
 	input  signed [5:0] fg_off_x,
 	input  signed [5:0] bg_off_x,
 	input  signed [5:0] spr_off_x,
@@ -143,7 +153,7 @@ mc6809i u_maincpu
 	.AVMA    (),
 	.BUSY    (),
 	.LIC     (),
-	.nHALT   (~pause),
+	.nHALT   (~(pause | hs_req)),
 	.nRESET  (~reset),
 	.nDMABREQ(1'b1),
 	.OP      (),
@@ -197,13 +207,32 @@ wire        vblank_rise;
 // ============================================================
 // Work RAM (4KB) — dual port (porta B non usata esternamente; placeholder)
 // ============================================================
+// BS=BA=1 confirma que el 6809 ha liberado el bus al atender HALT.
+// No se toma posesión por una espera arbitraria ni cortando el reloj.
+assign hs_ack = hs_req && cpu_bs && cpu_ba && !reset;
+reg [1:0] hs_phase = 2'd0;
+wire hs_access = hs_ack && hs_valid && hs_addr < 32'h1000;
+wire hs_ram_write = hs_access && hs_write && hs_phase == 2'd0;
+always @(posedge clk) begin
+	hs_ready <= 1'b0;
+	if (reset || !hs_access) hs_phase <= 2'd0;
+	else case (hs_phase)
+		2'd0: hs_phase <= 2'd1;
+		2'd1: begin
+			// El puerto B es síncrono: su dato ya está disponible.
+			hs_ready <= 1'b1;
+			hs_phase <= 2'd2;
+		end
+		default: ; // Esperar que el motor retire mem_valid.
+	endcase
+end
 wire [7:0] wram_do;
 jtframe_dual_ram_cen #(.DW(8), .AW(12)) u_wram (
 	.clk0 (clk), .cen0 (1'b1),
 	.data0(cpu_dout), .addr0(cpu_addr[11:0]),
-	.we0  (cs_wram & cpu_we), .q0 (wram_do),
+	.we0  (cs_wram & cpu_we & ~hs_ack), .q0 (wram_do),
 	.clk1 (clk), .cen1 (1'b1),
-	.data1(8'd0), .addr1(12'd0), .we1(1'b0), .q1()
+	.data1(hs_wdata), .addr1(hs_addr[11:0]), .we1(hs_ram_write), .q1(hs_rdata)
 );
 
 // ============================================================

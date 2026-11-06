@@ -221,6 +221,7 @@ localparam CONF_STR = {
 	// "P1O[81:76],Scia scroll patch,0,+1,...,-1;",
 	// "P1O[85:82],8px shift left,0,1,2,3,4,5,6,7,8;",
 	"O[18],Clean Pause,Off,On;",
+	"O[8],Autosave Hiscores,Off,On;",
 	"-;",
 	"P2,Audio;",
 	"P2O[88:86],Volume,100%,125%,150%,175%,200%;",
@@ -246,6 +247,28 @@ wire        ioctl_wr;
 wire [26:0] ioctl_addr;
 wire  [7:0] ioctl_dout;
 wire        ioctl_wait;
+wire ioctl_upload, ioctl_upload_req;
+wire [7:0] ioctl_din;
+wire hs_req, hs_ack, hs_valid, hs_write, hs_ready, hs_busy, hs_configured;
+wire [31:0] hs_addr;
+wire [7:0] hs_wdata, hs_rdata;
+
+// Motor de Hiscores_MiSTer/Bagman ya utilizado en las otras integraciones.
+// Adaptación City Connection: J. M. Artés, 2026.
+jtframe_hiscore #(.HS_SCOREWIDTH(8), .CFG_ADDRESSWIDTH(4), .CFG_LENGTHWIDTH(1)) hiscores (
+	.clk(clk_sys), .reset(reset), .autosave(status[8]),
+	.cfg_download(ioctl_download && ioctl_index == 16'd5),
+	.data_download(ioctl_download && ioctl_index == 16'd6),
+	.data_upload(ioctl_upload && ioctl_index == 16'd6),
+	.ioctl_upload_req(ioctl_upload_req), .ioctl_wr(ioctl_wr),
+	.ioctl_addr(ioctl_addr), .OSD_STATUS(OSD_STATUS),
+	.data_from_hps(ioctl_dout), .data_to_hps(ioctl_din),
+	.takeover_req(hs_req), .takeover_ack(hs_ack),
+	.mem_valid(hs_valid), .mem_write(hs_write), .mem_addr(hs_addr),
+	.mem_wdata(hs_wdata), .mem_ready(hs_ready), .mem_rdata(hs_rdata),
+	.save_busy(hs_busy), .configured(hs_configured)
+);
+assign ioctl_wait = hs_busy;
 
 hps_io #(.CONF_STR(CONF_STR)) hps_io
 (
@@ -265,6 +288,10 @@ hps_io #(.CONF_STR(CONF_STR)) hps_io
 	.ioctl_wr(ioctl_wr),
 	.ioctl_addr(ioctl_addr),
 	.ioctl_dout(ioctl_dout),
+	.ioctl_upload(ioctl_upload),
+	.ioctl_upload_req(ioctl_upload_req),
+	.ioctl_upload_index(8'd6),
+	.ioctl_din(ioctl_din),
 	.ioctl_wait(ioctl_wait)
 );
 
@@ -306,7 +333,8 @@ pll pll
 );
 
 // Reset della CPU/gioco: include download (game in reset finché ROM arriva).
-wire reset = RESET | status[0] | buttons[1] | ~pll_locked | ioctl_download;
+wire reset = RESET | status[0] | buttons[1] | ~pll_locked
+           | (ioctl_download && ioctl_index != 16'd5 && ioctl_index != 16'd6);
 
 // Reset del video: SOLO ~pll_locked. Il video deve generare sync sempre, anche
 // durante download, altrimenti il framework Sorgelig non mostra il memtest.
@@ -465,6 +493,14 @@ citycon_top game
 	.reset          (reset),
 	.video_reset    (video_reset),
 	.pause          (pause),
+	.hs_req         (hs_req),
+	.hs_ack         (hs_ack),
+	.hs_valid       (hs_valid),
+	.hs_write       (hs_write),
+	.hs_addr        (hs_addr),
+	.hs_wdata       (hs_wdata),
+	.hs_ready       (hs_ready),
+	.hs_rdata       (hs_rdata),
 	.ce_pix         (ce_pix),
 	.vblank_irq     (vblank_irq),
 
